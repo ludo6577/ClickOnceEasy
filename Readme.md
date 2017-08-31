@@ -4,12 +4,12 @@ This project simplify the ClickOnce deployment of all applications type.
 
 Just **Configure**, **Build** your app in the *Bin folder* and **Run the script**! 
 
-That's it! you app and all his updates are now available to your customers!
+That's it! your app and all his updates are now available to your customers!
 
 ## Files #####
 1) deploy.ps1: the deployement script (contains all the parameters and generation's commands)
 2) mage.exe: ClickOnce packager
-3) readme.txt
+3) readme.md
 
 ## Variables (deploy.ps1) ##
 1) $Version: version of the app (need to be incremented so the user can update his version)
