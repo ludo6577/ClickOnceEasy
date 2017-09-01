@@ -5,8 +5,8 @@
 ######################################################################################################
 
 ###### Variables ######
-$Version = "1.0.0.0"
-$AppName = "SoftFluentApp"  	#  do not call the Unity project the same as $AppName in deploy script
+$Version = "20.0.0.0"
+$AppName = "SoftFluentApp4"  	#  do not call the Unity project the same as $AppName in deploy script
 $Publisher = "SoftFluent"
 $ServerUrl = "\\sfsrv03\Temp\lfe\Deployment"
 
@@ -15,9 +15,11 @@ $BinDirectory = "Bin" 			# Unity compiled application (everything in this folder
 $OutputDirectory = "Output"		# Output (manifests and compressed archive)
 $ToolsDirectory = "Tools"		# Launcher.exe (a simple console application that launch the Unity Project and unzip it if necessary)
 
+# Other
+$IconFile = "icon.ico"
 
 ########################################################################
-# 1) Prepare the application in the Temp folder
+# 1) Prepare the application in the Output folder
 # Clear Output directory (create if doesn't exists)
 New-Item -ItemType Directory -Force -Path $OutputDirectory
 Remove-Item $OutputDirectory\* -recurse
@@ -27,14 +29,22 @@ Add-Type -Assembly System.IO.Compression.FileSystem
 $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
 [System.IO.Compression.ZipFile]::CreateFromDirectory($BinDirectory, "$OutputDirectory\App.zip", $compressionLevel, $false)
 
-# Then add the Launcher.exe in Output directory (and rename it to the name of the project)
+# Then add the icon and the Launcher.exe in Output directory (and rename it to the name of the project)
+Copy-Item -Path $IconFile $OutputDirectory
 Copy-Item -Path $ToolsDirectory\Launcher.exe $OutputDirectory
 Rename-Item $OutputDirectory\Launcher.exe "$AppName.exe"
 
+# Set a file with some informations in it
+$file = "$OutputDirectory\infos.txt"
+"Version:$Version" | Set-Content $file 
+"AppName:$AppName" | Add-Content $file
+"Publisher:$Publisher" | Add-Content $file
+"ServerUrl:$ServerUrl" | Add-Content $file
+"IconFile:$IconFile" | Add-Content $file
 
 ########################################################################
 # 2) Manifest Creation
-.\mage -New Application -name "$AppName" -Version $Version -FromDirectory $OutputDirectory\ -ToFile "$OutputDirectory\$AppName.exe.manifest"
+.\mage -New Application -name "$AppName" -Version $Version -IconFile $IconFile -FromDirectory $OutputDirectory\ -ToFile "$OutputDirectory\$AppName.exe.manifest"
 
 # TODO: sign the manifest with Authenticode certificate (Replace mycert.pfx with the path to your certificate file. Replace passwd with the password for your certificate file.)
 #mage -Sign $AppName.exe.manifest -CertFile mycert.pfx -Password passwd  
@@ -46,7 +56,6 @@ Rename-Item $OutputDirectory\Launcher.exe "$AppName.exe"
 
 # TODO: Sign the deployment manifest
 # mage -Sign $AppName.application -CertFile mycert.pfx -Password passwd  
-
 
 ########################################################################
 # 4) Deployment
