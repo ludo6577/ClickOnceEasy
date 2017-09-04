@@ -25,17 +25,15 @@ namespace Launcher
 
             try
             {
+                // Check for an update on the server
                 var updateAvailable = CheckUpdateAvailable(Path.Combine(infoDic["ServerUrl"], "infos.txt"), infoDic["Version"]);
                 if (updateAvailable)
                 {
                     Process.Start(Path.Combine(infoDic["ServerUrl"], infoDic["AppName"]) + ".application");
                     return;
                 }
-
-                var fullPath = Process.GetCurrentProcess().MainModule.FileName;
-                var index = fullPath.LastIndexOf('\\') + 1;
-                var fileName = fullPath;//.Substring(index, fullPath.Length - index);
                 
+                // Unzip file and create desktop icon
                 var zipName = "App.zip";
                 if (File.Exists(zipName))
                 {
@@ -43,18 +41,21 @@ namespace Launcher
                    CreateDesktopIcon(infoDic["Publisher"], infoDic["AppName"]);
                 }
 
-                string[] filesPaths = Directory.GetFiles(fullPath.Substring(0, fullPath.LastIndexOf("\\")), "*.exe");
-
-                //Used only while executing in visual studio
+                // Get this program path
+                var fullPath = Process.GetCurrentProcess().MainModule.FileName;
+                
+                // Used only while executing in visual studio
                 var fileNameVsHost = "";
-                if(fileName.Contains("vshost"))
-                    fileNameVsHost = fileName.Substring(0, fileName.LastIndexOf("vshost")) + "exe";   //Remove the .vshost
+                if(fullPath.Contains("vshost"))
+                    fileNameVsHost = fullPath.Substring(0, fullPath.LastIndexOf("vshost")) + "exe";   //Remove the .vshost
                 else
-                    fileNameVsHost = fileName.Substring(0, fileName.LastIndexOf('.')) + ".vshost.exe";  //Add the .vshost
+                    fileNameVsHost = fullPath.Substring(0, fullPath.LastIndexOf('.')) + ".vshost.exe";  //Add the .vshost
 
+                // Find all exe files in the current folder and start the first one
+                string[] filesPaths = Directory.GetFiles(fullPath.Substring(0, fullPath.LastIndexOf("\\")), "*.exe");
                 foreach (var file in filesPaths)
                 {
-                    if (file != fileName && file != fileNameVsHost)
+                    if (file != fullPath && file != fileNameVsHost)
                     {
                         Process.Start(file);
                         return;
@@ -141,7 +142,7 @@ namespace Launcher
                 AppName,
                 ".appref-ms");
 
-            System.IO.File.Copy(shortcutName, desktopPath, true);
+            File.Copy(shortcutName, desktopPath, true);
         }
     }
 }
