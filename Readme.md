@@ -8,7 +8,7 @@ That's it! your app and all his updates are now available to your customers!
 
 ## How to ##
 1) Put Application's build files in the *Bin* folder (or configure the Application's Bin folder path in *deploy.ps1*)
-2) In *deploy.ps1*: configure the **$Version**, **AppName**, **$Publisher** and **$ServerUrl**
+2) In *deploy.ps1*: configure the **$Version**, **$AppName**, **$Publisher** and **$ServerUrl**
 3) Run powershell script: *deploy.ps1*
 4) then run the *ClickOnce launcher* named *AppName.application* (from the *Output* folder or from the **$ServerUrl**)
 5) When you want to deploy a new version increment the **$Version** parameter and re-run the powershell script
